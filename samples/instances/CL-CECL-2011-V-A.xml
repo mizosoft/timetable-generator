@@ -1,0 +1,167 @@
+<file>
+	<data>
+		<entities>
+			<classes from="0" to="13"/>
+			<teachers from="0" to="28"/>
+			<days from="0" to="4"/>
+			<periods from="0" to="4"/>
+		</entities>
+
+		<requirements>
+			<requirement class="0" teacher="1" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="4" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="7" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="0" teacher="8" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="11" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="13" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="14" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="21" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="23" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="0" teacher="24" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="1" teacher="0" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="1" teacher="2" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="1" teacher="3" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="1" teacher="7" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="1" teacher="8" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="1" teacher="10" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="1" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="1" teacher="23" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="2" teacher="3" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="2" teacher="4" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="2" teacher="6" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="2" teacher="11" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="2" teacher="17" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="2" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="2" teacher="22" lessons="6" max_per_day="2" double_lessons="3"/>
+			<requirement class="3" teacher="0" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="3" teacher="4" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="3" teacher="6" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="3" teacher="16" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="3" teacher="17" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="3" teacher="19" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="3" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="3" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="4" teacher="3" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="4" teacher="4" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="4" teacher="6" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="4" teacher="7" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="4" teacher="11" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="4" teacher="17" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="4" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="4" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="5" teacher="0" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="5" teacher="2" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="5" teacher="3" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="5" teacher="8" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="5" teacher="10" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="5" teacher="16" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="5" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="5" teacher="23" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="1" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="5" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="9" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="14" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="15" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="6" teacher="18" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="25" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="26" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="6" teacher="27" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="6" teacher="28" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="1" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="3" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="4" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="6" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="8" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="9" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="11" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="13" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="14" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="18" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="7" teacher="24" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="1" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="8" teacher="8" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="9" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="14" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="15" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="18" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="23" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="25" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="8" teacher="26" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="8" teacher="27" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="1" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="5" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="11" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="13" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="15" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="9" teacher="18" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="19" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="21" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="9" teacher="26" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="9" teacher="27" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="10" teacher="2" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="10" teacher="6" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="10" teacher="7" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="10" teacher="8" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="10" teacher="17" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="10" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="10" teacher="21" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="10" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="1" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="2" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="5" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="12" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="13" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="18" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="19" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="21" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="26" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="11" teacher="27" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="12" teacher="0" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="12" teacher="4" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="12" teacher="6" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="12" teacher="16" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="12" teacher="17" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="12" teacher="19" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="12" teacher="20" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="12" teacher="22" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="1" lessons="3" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="4" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="8" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="9" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="11" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="13" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="14" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="18" lessons="4" max_per_day="2" double_lessons="2"/>
+			<requirement class="13" teacher="21" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="23" lessons="2" max_per_day="2" double_lessons="1"/>
+			<requirement class="13" teacher="24" lessons="2" max_per_day="2" double_lessons="1"/>
+		</requirements>
+
+		<teacherunavailabilities>
+			<unavailability teacher="15" day="0" period="3"/>
+			<unavailability teacher="15" day="0" period="4"/>
+			<unavailability teacher="15" day="3" period="0"/>
+			<unavailability teacher="15" day="3" period="1"/>
+			<unavailability teacher="15" day="3" period="2"/>
+			<unavailability teacher="15" day="3" period="3"/>
+			<unavailability teacher="15" day="3" period="4"/>
+			<unavailability teacher="15" day="4" period="0"/>
+			<unavailability teacher="15" day="4" period="1"/>
+			<unavailability teacher="15" day="4" period="2"/>
+			<unavailability teacher="15" day="4" period="3"/>
+			<unavailability teacher="15" day="4" period="4"/>
+			<unavailability teacher="16" day="0" period="1"/>
+			<unavailability teacher="16" day="0" period="2"/>
+			<unavailability teacher="16" day="1" period="3"/>
+			<unavailability teacher="16" day="1" period="4"/>
+			<unavailability teacher="27" day="0" period="1"/>
+			<unavailability teacher="27" day="0" period="2"/>
+			<unavailability teacher="27" day="0" period="3"/>
+			<unavailability teacher="27" day="2" period="3"/>
+			<unavailability teacher="27" day="2" period="4"/>
+		</teacherunavailabilities>
+	</data>
+</file>

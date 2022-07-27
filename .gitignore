@@ -8,4 +8,10 @@ nbdist/
 .nb-gradle/
 .idea/
 out/
+.gradle/
+venv/
+site/
+**/.vscode/
 
+*.iml
+TODO.txt
