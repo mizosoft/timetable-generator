@@ -22,12 +22,40 @@ public class Models {
     public int total() {
       return teacherClashes + groupClashes + groupIdleness + teacherUnavailabilities + dailyExceedences;
     }
+
+    public int total(HardWeights weights) {
+      return (int) (teacherClashes * weights.teacherClashes() + groupClashes + weights.groupClashes() + groupIdleness * weights.groupIdleness() + teacherUnavailabilities * weights.teacherUnavailabilities() + dailyExceedences * weights.dailyExceedences());
+    }
   }
 
-  record SoftCost( int teacherIdleness, int doubleLessons) {
+  record SoftCost(int teacherIdleness, int doubleLessons) {
     public int total() {
       return doubleLessons + teacherIdleness;
     }
+
+    public int total(SoftWeights weights) {
+      return (int) (doubleLessons * weights.doubleLessons() + teacherIdleness * weights.teacherIdleness());
+    }
+  }
+
+  record TotalCost(HardCost hardCost, SoftCost softCost) {
+    public int total() {
+      return hardCost.total() + (int) (0.5 * softCost.total());
+//      return hardCost.total();
+    }
+    public int total(Weights weights) {
+      return hardCost.total(weights.hardWeights()) + softCost.total(weights.softWeights());
+    }
+  }
+
+  record HardWeights(double teacherClashes, double groupClashes, double groupIdleness, double teacherUnavailabilities, double dailyExceedences) {
+
+  }
+  record SoftWeights(double teacherIdleness, double doubleLessons) {
+
+  }
+  record Weights(HardWeights hardWeights, SoftWeights softWeights) {
+
   }
 
   record ProblemInstance(
@@ -41,5 +69,9 @@ public class Models {
       Map<Lesson, Integer> weeklyOccurrences,
       Map<Lesson, Integer> maxDailyOccurrences,
       Map<Teacher, Set<Period>> teacherUnavailabilities,
-      Map<Lesson, Integer> doubleLessons) {}
+      Map<Lesson, Integer> doubleLessons) {
+    public int periodCount() {
+      return dayCount * slotCount;
+    }
+  }
 }
