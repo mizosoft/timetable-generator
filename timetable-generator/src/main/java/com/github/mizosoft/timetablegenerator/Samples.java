@@ -32,14 +32,13 @@ public final class Samples {
       Map<Lesson, Integer> doubleLessons,
       Map<String, Teacher> teachers,
       Map<String, Group> groups) {
-    var rootCourse = new Course("root", "root");
     var requirementsList = doc.getElementsByTagName("requirement");
     for (int i = 0; i < requirementsList.getLength(); i++) {
       var req = (Element) requirementsList.item(i);
       var teacher =
           teachers.computeIfAbsent(req.getAttribute("teacher"), id -> new Teacher(id, id));
       var group = groups.computeIfAbsent(req.getAttribute("class"), id -> new Group(id, id));
-      var lesson = new Lesson(rootCourse, teacher, group);
+      var lesson = new Lesson(teacher, group);
       lessons.add(lesson);
       weeklyOccurrences.put(lesson, Integer.parseInt(req.getAttribute("lessons")));
       maxDailyOccurrences.put(lesson, Integer.parseInt(req.getAttribute("max_per_day")));
@@ -103,5 +102,9 @@ public final class Samples {
     } catch (ParserConfigurationException | SAXException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  static ProblemInstance readInstance() {
+    return readInstance("NE-CESVP-2011-M-D.xml");
   }
 }

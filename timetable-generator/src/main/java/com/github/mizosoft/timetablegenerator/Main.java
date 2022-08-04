@@ -1,8 +1,11 @@
 package com.github.mizosoft.timetablegenerator;
 
+import com.github.mizosoft.timetablegenerator.Models.HardCost;
+import com.github.mizosoft.timetablegenerator.Models.SoftCost;
+import com.github.mizosoft.timetablegenerator.Models.TotalCost;
+
 public class Main {
   public static void main(String[] args) {
-    var solver = new Solver(Samples.readInstance("NE-CESVP-2011-M-D.xml"));
-    solver.geneticAlgorithm();
+
   }
 }

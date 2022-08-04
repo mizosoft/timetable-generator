@@ -8,41 +8,32 @@ public class Models {
 
   record Course(String id, String name) {}
 
-  record Lesson(Course course, Teacher teacher, Group group) {}
+  record Lesson(Teacher teacher, Group group) {}
 
   record Group(String id, String name) {}
 
   record Period(int day, int slot) {}
 
   record HardCost(int teacherClashes, int groupClashes, int groupIdleness, int teacherUnavailabilities, int dailyExceedences) {
-//    HardCost(int teacherClashes, int groupClashes, int groupIdleness, int teacherUnavailabilities, int maxDailyOccurrences) {
-//      this(teacherClashes + groupClashes + groupIdleness + teacherUnavailabilities + maxDailyOccurrences, teacherClashes, groupClashes, groupIdleness, teacherUnavailabilities, maxDailyOccurrences);
-//    }
-
-    public int total() {
-      return teacherClashes + groupClashes + groupIdleness + teacherUnavailabilities + dailyExceedences;
-    }
 
     public int total(HardWeights weights) {
-      return (int) (teacherClashes * weights.teacherClashes() + groupClashes + weights.groupClashes() + groupIdleness * weights.groupIdleness() + teacherUnavailabilities * weights.teacherUnavailabilities() + dailyExceedences * weights.dailyExceedences());
+      return (int) (teacherClashes * weights.teacherClashes()
+          + groupClashes * weights.groupClashes()
+          + groupIdleness * weights.groupIdleness()
+          + teacherUnavailabilities * weights.teacherUnavailabilities()
+          + dailyExceedences * weights.dailyExceedences());
     }
   }
 
   record SoftCost(int teacherIdleness, int doubleLessons) {
-    public int total() {
-      return doubleLessons + teacherIdleness;
-    }
 
     public int total(SoftWeights weights) {
-      return (int) (doubleLessons * weights.doubleLessons() + teacherIdleness * weights.teacherIdleness());
+      return (int) (doubleLessons * weights.doubleLessons()
+          + teacherIdleness * weights.teacherIdleness());
     }
   }
 
   record TotalCost(HardCost hardCost, SoftCost softCost) {
-    public int total() {
-      return hardCost.total() + (int) (0.5 * softCost.total());
-//      return hardCost.total();
-    }
     public int total(Weights weights) {
       return hardCost.total(weights.hardWeights()) + softCost.total(weights.softWeights());
     }
