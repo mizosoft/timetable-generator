@@ -8,7 +8,7 @@ greedily randomized construction of the initial population.
 
 The school timetabling problem involves allocating resources (e.g. teachers, classes, rooms) to timeslots,
 such that each resource has at most one allocation per timeslot.
-This is an NP-complete problem [1], meaning there exists no efficient algorithm for finding an optimal solution for the problem. 
+This is an NP-complete problem, meaning there exists no efficient algorithm for finding an optimal solution for the problem. 
 
 This project tackles the Class-Teacher variant of this problem [1]. It is assumed that class & teacher
 associations are known beforehand (i.e. it is known which classes ought to take what lessons with which teachers). This 
