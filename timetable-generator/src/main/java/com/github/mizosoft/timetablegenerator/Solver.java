@@ -3,7 +3,6 @@ package com.github.mizosoft.timetablegenerator;
 
 import com.github.mizosoft.timetablegenerator.Models.Group;
 import com.github.mizosoft.timetablegenerator.Models.HardWeights;
-import com.github.mizosoft.timetablegenerator.Models.Lesson;
 import com.github.mizosoft.timetablegenerator.Models.ProblemInstance;
 import com.github.mizosoft.timetablegenerator.Models.SoftWeights;
 import com.github.mizosoft.timetablegenerator.Models.Teacher;
@@ -22,10 +21,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGenerator.SplittableGenerator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class GeneticAlgorithm {
+public final class Solver {
   private final ProblemInstance instance;
   private final Indexer<Teacher> teacherIndexer;
   private final Indexer<Group> groupIndexer;
@@ -45,10 +43,8 @@ public class GeneticAlgorithm {
   private final BiFunction<Integer, Double, Double> mutationProbabilityUpdate;
 
   private double mutationProbability;
-  private final boolean[][] isTeacherUnavailable;
 
-
-  GeneticAlgorithm(
+  Solver(
       ProblemInstance instance, Weights weights, int populationSize,int elitism, int maxIterations,
       double initialMutationProbability,
       double maxMutationProbability, BiFunction<Integer, Double, Double> mutationProbabilityUpdate,
@@ -74,13 +70,11 @@ public class GeneticAlgorithm {
         rootRnd
             .splits(parallelism)
             .toArray(RandomGenerator[]::new);
-
-    isTeacherUnavailable = costFunction.isTeacherUnavailable;
   }
 
   private record Individual(int[][] table, TotalCost cost) {}
 
-  private class InitializePopulationTask implements Runnable {
+  private final class InitializePopulationTask implements Runnable {
     private final Individual[] population;
     private final int from, to;
     private final RandomGenerator rnd;
@@ -103,14 +97,14 @@ public class GeneticAlgorithm {
   }
 
   private enum MatingStrategy {
-    RANDOM, BEST_GENE, ROULETTE_WHEEL
+    RANDOM, ROULETTE_WHEEL
   }
 
   private enum MutationStrategy {
-    VANILLA, SIMULATED_ANNEALING
+    RANDOM, SIMULATED_ANNEALING
   }
 
-  private class GenerateOffspringTask implements Runnable {
+  private final class GenerateOffspringTask implements Runnable {
     private final Individual[] currentPopulation;
     private final Individual[] nextPopulation;
     private final double[] cdf;
@@ -134,21 +128,6 @@ public class GeneticAlgorithm {
     private int[] getSelections(Individual[] parents) {
       var selections = new int[instance.groupCount()];
       switch (matingStrategy) {
-        case BEST_GENE -> {
-          for (int group = 0; group < instance.groupCount(); group++) {
-            int selected = 0;
-            int best = costFunction.computeTotalCostForGroup(parents[0].table(), group).total(weights);
-            for (int i = 1; i < parents.length; i++) {
-              var cost = costFunction.computeTotalCostForGroup(parents[i].table(), group).total(weights);
-              if (cost < best) {
-                selected = i;
-                best = cost;
-              }
-            }
-            selections[group] = selected;
-          }
-        }
-
         case RANDOM -> {
           for (int group = 0; group < instance.groupCount(); group++) {
             selections[group] = rnd.nextInt(parents.length);
@@ -203,7 +182,7 @@ public class GeneticAlgorithm {
         }
 
         switch (mutationStrategy) {
-          case VANILLA -> mutate(offspring, rnd);
+          case RANDOM -> mutate(offspring, rnd);
           case SIMULATED_ANNEALING -> offspring = simulatedAnnealing(offspring, simulatedAnnealingIterations, initialTemperature, rnd);
         }
 
@@ -246,13 +225,6 @@ public class GeneticAlgorithm {
           instance.weeklyOccurrences().get(lesson));
     }
 
-//    if (!lessons.entrySet().stream().map(e -> Map.entry(new Lesson(teacherIndexer.valueOf(e.getKey().teacher),
-//        groupIndexer.valueOf(e.getKey().group)), e.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).equals(
-//            instance.weeklyOccurrences()
-//    )) {
-//      throw new RuntimeException("gaga");
-//    }
-
     int totalUnscheduledCount = 0;
     var unscheduledCount = new int[instance.groupCount()][instance.teacherCount()];
     for (var lesson : lessons.keySet()) {
@@ -269,7 +241,7 @@ public class GeneticAlgorithm {
     var isTeacherAvailable = new boolean[instance.teacherCount()][instance.periodCount()];
     for (int teacher = 0; teacher < instance.teacherCount(); teacher++) {
       for (int period = 0; period < instance.periodCount(); period++) {
-        isTeacherAvailable[teacher][period] = !isTeacherUnavailable[period][teacher];
+        isTeacherAvailable[teacher][period] = !costFunction.isTeacherUnavailable(teacher, period);
       }
     }
 
@@ -314,7 +286,7 @@ public class GeneticAlgorithm {
       }
 
       if (freePeriods.isEmpty()) {
-        // Choose any free period for the group without avoiding teacher conflict
+        // Choose any free period for the group without necessarily avoiding teacher conflict
         for (int period = 0; period < instance.periodCount(); period++) {
           if (isGroupAvailable[chosenLesson.group][period]) {
             freePeriods.add(period);
@@ -322,12 +294,9 @@ public class GeneticAlgorithm {
         }
       }
 
-      // TODO prioritize periods with less teacher availability
       int chosenPeriod = freePeriods.get(rnd.nextInt(freePeriods.size()));
 
-      if (table[chosenPeriod][chosenLesson.group] != -1) {
-        throw new RuntimeException("bruh");
-      }
+      assert table[chosenPeriod][chosenLesson.group] != -1;
 
       table[chosenPeriod][chosenLesson.group] = chosenLesson.teacher;
       unscheduledCount[chosenLesson.group][chosenLesson.teacher]--;
@@ -373,16 +342,15 @@ public class GeneticAlgorithm {
   }
 
   private void mutate(int[][] table, RandomGenerator rnd) {
-//    for (int group = 0; group < instance.groupCount(); group++) {
     int group = rnd.nextInt(instance.groupCount());
-      if (rnd.nextDouble() < mutationProbability) {
-        int fromPeriod = rnd.nextInt(instance.periodCount());
-        int toPeriod = rnd.nextInt(instance.periodCount());
+    if (rnd.nextDouble() < mutationProbability) {
+      int fromPeriod = rnd.nextInt(instance.periodCount());
+      int toPeriod = rnd.nextInt(instance.periodCount());
 
-        int temp = table[fromPeriod][group];
-        table[fromPeriod][group] = table[toPeriod][group];
-        table[toPeriod][group] = temp;
-      }
+      int temp = table[fromPeriod][group];
+      table[fromPeriod][group] = table[toPeriod][group];
+      table[toPeriod][group] = temp;
+    }
   }
 
   Individual[] run() {
@@ -397,20 +365,6 @@ public class GeneticAlgorithm {
     var population = new Individual[populationSize];
 
     initializePopulation(population, pool);
-
-//    System.out.println(Stream.of(population)
-//        .min(Comparator.comparing(Individual::cost,
-//            Comparator.comparingInt(cost -> cost.total(weights)))).map(ind -> ind.cost().total(weights)));
-
-//    System.out.println(Stream.of(population).mapToInt(ind -> ind.cost().total(weights)).average());
-//
-//    System.out.println(
-//        Stream.of(population)
-//            .map(Individual::cost)
-//            .sorted(Comparator.comparingInt(cost -> cost.total(weights)))
-//            .limit(10)
-//            .map(Object::toString)
-//            .collect(Collectors.joining(", ")));
 
     for (int i = 0; i < maxIterations; i++) {
       int ceiling = Stream.of(population)
@@ -434,86 +388,31 @@ public class GeneticAlgorithm {
       }
 
       var matingStrategy = i % 2 == 0 ? MatingStrategy.ROULETTE_WHEEL : MatingStrategy.RANDOM;
-      var mutationStrategy = rootRnd.nextDouble() < 0.1 ? MutationStrategy.SIMULATED_ANNEALING : MutationStrategy.VANILLA;
+      var mutationStrategy = rootRnd.nextDouble() < 0.1 ? MutationStrategy.SIMULATED_ANNEALING : MutationStrategy.RANDOM;
       population = generateNextPopulation(
           population,
           cdf,
-        matingStrategy,
+          matingStrategy,
           mutationStrategy,
           pool);
-
-//      if (Stream.of(population)
-//          .anyMatch(individual -> individual.cost().hardCost().total(weights.hardWeights()) == 0)) {
-//        return population;
-//      }
 
       mutationProbability = Math.min(
           maxMutationProbability, mutationProbabilityUpdate.apply(i, mutationProbability));
 
-//      if ((i % 100) == 0) {
-//        System.out.println("Iteration: " + i);
-//        System.out.println(Stream.of(population)
-//            .map(Individual::cost)
-//            .sorted(Comparator.comparingInt(cost -> cost.total(weights)))
-//            .limit(10)
-//            .map(cost -> new Pair(cost, cost.total(weights), cost.hardCost().total(weights.hardWeights())))
-//            .map(Object::toString)
-//            .collect(Collectors.joining(", ")));
-//      }
-
-      if ((i % 500) == 0) {
-//        System.out.println(mutationProbability);
-        System.out.println(i);
-        System.out.println(
+      if ((i % 200) == 0) {
+        System.out.println("Min cost (iter " + i + "): " +
             Stream.of(population)
                 .map(Individual::cost)
-                .sorted(Comparator.comparingInt(cost -> cost.total(weights)))
-                .limit(10)
-                .map(Object::toString)
-                .collect(Collectors.joining(", ")));
+                .min(Comparator.comparingInt(cost -> cost.total(weights)))
+                .orElseThrow());
       }
     }
     return population;
   }
 
-  private int[][] generateInitialTable(RandomGenerator rnd) {
-    var timetable = new int[instance.periodCount()][instance.groupCount()];
-
-    for (var row : timetable) {
-      Arrays.fill(row, -1);
-    }
-
-    for (var lesson : instance.lessons()) {
-      int group = groupIndexer.indexOf(lesson.group());
-      int lessonCount = instance.weeklyOccurrences().get(lesson);
-
-      var freePeriods = new ArrayList<Integer>();
-      for (int period = 0; period < instance.periodCount(); period++) {
-        if (timetable[period][group] == -1) {
-          freePeriods.add(period);
-        }
-      }
-
-      for (int i = 0; i < lessonCount; i++) {
-        if (freePeriods.isEmpty()) {
-          throw new IllegalStateException("bruh");
-        }
-
-        int k = rnd.nextInt(freePeriods.size());
-        if (timetable[freePeriods.get(k)][group] != -1) {
-          throw new RuntimeException("bruh");
-        }
-        timetable[freePeriods.get(k)][group] = teacherIndexer.indexOf(lesson.teacher());
-        freePeriods.remove(k);
-      }
-    }
-    return timetable;
-  }
-
   private int rouletteWheel(double[] cdf, RandomGenerator rnd) {
     double p = rnd.nextDouble();
 
-    // TODO we can implement this with binary search.
     int selected = 0;
     for (int j = 1; j < cdf.length - 1 && p > cdf[j]; j++) {
       selected = j;
@@ -527,50 +426,34 @@ public class GeneticAlgorithm {
   }
 
   private int[][] simulatedAnnealing(int[][] table, int iterations, double initialTemperature, RandomGenerator rnd) {
-    //    var tracker = new CostTracker(individual);
-    //    System.out.println("Initial cost: " + tracker.cost());
-
     var mutatedTable = new int[instance.periodCount()][instance.groupCount()];
     for (int period = 0; period < instance.periodCount(); period++) {
       System.arraycopy(table[period], 0, mutatedTable[period], 0, instance.groupCount());
     }
 
-//    double temperature = initialTemperature;
     for (int i = 0; i < iterations; i++) {
       var cost = costFunction.computeTotalCost(mutatedTable);
 
-      record Mutation(int group, int fromPeriod, int toPeriod) {}
-
-      var mutations = new ArrayList<Mutation>();
-//      for (int group = 0; group < groupIndexer.size(); group++) {
       int group = rnd.nextInt(instance.groupCount());
-//        if (rnd.nextDouble() < mutationProbability) {
-          int fromPeriod = rnd.nextInt(instance.periodCount());
-          int toPeriod = rnd.nextInt(instance.periodCount());
+      int fromPeriod = rnd.nextInt(instance.periodCount());
+      int toPeriod = rnd.nextInt(instance.periodCount());
 
-          int temp = mutatedTable[fromPeriod][group];
-          mutatedTable[fromPeriod][group] = mutatedTable[toPeriod][group];
-          mutatedTable[toPeriod][group] = temp;
-
-          mutations.add(new Mutation(group, fromPeriod, toPeriod));
-//        }
-//      }
+      int temp = mutatedTable[fromPeriod][group];
+      mutatedTable[fromPeriod][group] = mutatedTable[toPeriod][group];
+      mutatedTable[toPeriod][group] = temp;
 
       var updatedCost = costFunction.computeTotalCost(mutatedTable);
 
       int delta = updatedCost.total(weights) - cost.total(weights);
       double p = Math.exp(-delta / (initialTemperature / (1 + i)));
-      if (delta < 0
-          || (delta != 0 && rnd.nextDouble() < p)
-          || (delta == 0 && rnd.nextDouble() < 0.5)) {
-      } else {
-        // Reverse the mutations
-        for (var mut : mutations) {
-          int temp2 = mutatedTable[mut.toPeriod()][mut.group()];
-          mutatedTable[mut.toPeriod()][mut.group()] = mutatedTable[mut.fromPeriod()][mut.group()];
-          mutatedTable[mut.fromPeriod()][mut.group()] = temp2;
+      if (delta >= 0
+          && (delta == 0 || !(rnd.nextDouble() < p))
+          && (delta != 0 || !(rnd.nextDouble() < 0.5))) {
+            // Reverse the mutation
+          int temp2 = mutatedTable[toPeriod][group];
+          mutatedTable[toPeriod][group] = mutatedTable[fromPeriod][group];
+          mutatedTable[fromPeriod][group] = temp2;
         }
-      }
     }
     return mutatedTable;
   }
@@ -578,7 +461,7 @@ public class GeneticAlgorithm {
   public static void main(String[] args) {
     var weights = new Weights(new HardWeights(200.0, 200.0, 200.0, 200.0, 200.0), new SoftWeights(2.0, 4.0));
     var ga =
-        new GeneticAlgorithm(
+        new Solver(
             Samples.readInstance("NE-CESVP-2011-M-D.xml"),
             weights,
             64,
@@ -593,76 +476,31 @@ public class GeneticAlgorithm {
             60,
             60.0);
 
-//    long start = System.currentTimeMillis();
-//    var pop = ga.run();
-//    long end = System.currentTimeMillis();
-//    System.out.println(end - start);
-
-//    System.out.println(ga.costFunction.computeTotalCost(ga.generateInitialTable(ga.rootRnd)));
-
-//    double avg1 = Stream.generate(() -> ga.generateInitialTable(ga.rootRnd)).limit(64)
-//        .mapToInt(table -> ga.costFunction.computeTotalCost(table).total(weights)).average().orElseThrow();
-//    double avg2 = Stream.generate(() -> ga.constructTimetable(ga.rootRnd, 0.1)).limit(64)
-//        .mapToInt(table -> ga.costFunction.computeTotalCost(table).total(weights)).average().orElseThrow();
-//
-//    System.out.println(avg1);
-//    System.out.println(avg2);
-
-//    double alpha = 0.0;
-//    for (int i = 0; i < 10; i++) {
-//      var t = ga.constructTimetable(ga.rootRnd, alpha);
-//      System.out.println(ga.costFunction.computeTotalCost(t));
-//      alpha += 0.1;
-//    }
-////    ga.printTable(t);
-//
-//
-//    System.out.println(ga.costFunction.computeTotalCost(ga.generateInitialTable(ga.rootRnd)));
-//
-//    if(true) {return;}
-
     var result = ga.run();
+    var best = Stream.of(result).min(Comparator.comparing(Individual::cost, Comparator.comparingInt(cost -> cost.total(weights)))).orElseThrow();
+    System.out.println("Best cost: " + best.cost());
 
-    var best = Stream.of(result)
-        .min(Comparator.comparing(Individual::cost, Comparator.comparingInt(cost -> cost.total(weights)))).orElseThrow();
-    System.out.println(best.cost().total(weights));
-
-//    var ww = new Weights(new HardWeights(1.0, 1.0, 1.0, 1.0, 1.0), new SoftWeights(1.0, 1.0, 1.0));
-//    System.out.println(Stream.of(result).mapToInt(ind -> ind.cost().total(weights)).average());
-
-//    ga.printTable(best.table);
+    ga.printTable(best.table());
   }
 
   private void printTable(int[][] table) {
-
-    int i = 0;
-    var lessons = new HashMap<Lesson, Integer>();
-    for (var lesson : instance.lessons()) {
-      var r = lessons.put(lesson, ++i);
-      if (r != null) {
-        throw new RuntimeException("bruh");
-      }
-    }
-
     for (int day = 0; day < instance.dayCount(); day++) {
       if (day != 0) {
         System.out.println();
       }
+
       System.out.println("Day: " + day);
+
       System.out.print("    ");
       for (int slot = 0; slot < instance.slotCount(); slot++) {
         System.out.printf("%4d", slot);
       }
       System.out.println();
+
       for (int group = 0; group < instance.groupCount(); group++) {
         System.out.printf("%4d", group);
         for (int slot = 0; slot < instance.slotCount(); slot++) {
-          int teacher = table[day * instance.slotCount() + slot][group];
-          if (teacher == -1) {
-            System.out.printf("%4s", "X");
-          } else {
-            System.out.printf("%4d", teacher);
-          }
+          System.out.printf("%4d", table[day * instance.slotCount() + slot][group]);
         }
         System.out.println();
       }

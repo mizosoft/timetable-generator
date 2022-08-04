@@ -1,6 +1,5 @@
 package com.github.mizosoft.timetablegenerator;
 
-import com.github.mizosoft.timetablegenerator.Models.Course;
 import com.github.mizosoft.timetablegenerator.Models.Group;
 import com.github.mizosoft.timetablegenerator.Models.Lesson;
 import com.github.mizosoft.timetablegenerator.Models.Period;

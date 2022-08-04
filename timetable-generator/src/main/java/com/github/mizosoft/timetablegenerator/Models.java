@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Models {
-  record Teacher(String id, String name) {}
+  private Models() {}
 
-  record Course(String id, String name) {}
+  record Teacher(String id, String name) {}
 
   record Lesson(Teacher teacher, Group group) {}
 
