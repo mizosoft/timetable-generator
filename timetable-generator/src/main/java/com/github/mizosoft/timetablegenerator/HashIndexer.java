@@ -1,14 +1,11 @@
 package com.github.mizosoft.timetablegenerator;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
 
-final class HashIndexer<V> implements Indexer<V> {
+public final class HashIndexer<V> implements Indexer<V> {
   private final int size;
   private final List<V> values;
   private final Map<V, Integer> indices;

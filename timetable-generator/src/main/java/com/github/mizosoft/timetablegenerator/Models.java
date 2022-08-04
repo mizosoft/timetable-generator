@@ -14,7 +14,8 @@ public class Models {
 
   record Period(int day, int slot) {}
 
-  record HardCost(int teacherClashes, int groupClashes, int groupIdleness, int teacherUnavailabilities, int dailyExceedences) {
+  record HardCost(int teacherClashes, int groupClashes, int groupIdleness,
+                  int teacherUnavailabilities, int dailyExceedences) {
 
     public int total(HardWeights weights) {
       return (int) (teacherClashes * weights.teacherClashes()
@@ -39,15 +40,15 @@ public class Models {
     }
   }
 
-  record HardWeights(double teacherClashes, double groupClashes, double groupIdleness, double teacherUnavailabilities, double dailyExceedences) {
+  record HardWeights(double teacherClashes,
+                     double groupClashes,
+                     double groupIdleness,
+                     double teacherUnavailabilities,
+                     double dailyExceedences) {}
 
-  }
-  record SoftWeights(double teacherIdleness, double doubleLessons) {
+  record SoftWeights(double teacherIdleness, double doubleLessons) {}
 
-  }
-  record Weights(HardWeights hardWeights, SoftWeights softWeights) {
-
-  }
+  record Weights(HardWeights hardWeights, SoftWeights softWeights) {}
 
   record ProblemInstance(
       int dayCount,

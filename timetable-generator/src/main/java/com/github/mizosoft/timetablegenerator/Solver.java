@@ -45,10 +45,18 @@ public final class Solver {
   private double mutationProbability;
 
   Solver(
-      ProblemInstance instance, Weights weights, int populationSize,int elitism, int maxIterations,
+      ProblemInstance instance,
+      Weights weights,
+      int populationSize,
+      int elitism,
+      int maxIterations,
       double initialMutationProbability,
-      double maxMutationProbability, BiFunction<Integer, Double, Double> mutationProbabilityUpdate,
-      int parentCount, int parallelism, int seed, int simulatedAnnealingIterations,
+      double maxMutationProbability,
+      BiFunction<Integer, Double, Double> mutationProbabilityUpdate,
+      int parentCount,
+      int parallelism,
+      int seed,
+      int simulatedAnnealingIterations,
       double initialTemperature) {
     this.instance = instance;
     this.teacherIndexer = new HashIndexer<>(instance.teachers());
@@ -90,7 +98,7 @@ public final class Solver {
     @Override
     public void run() {
       for (int i = from; i < to; i++) {
-        var table =  constructTimetable(rnd, 0.1);
+        var table = constructTimetable(rnd, 0.1);
         population[i] = new Individual(table, costFunction.computeTotalCost(table));
       }
     }
@@ -113,7 +121,8 @@ public final class Solver {
     private final MatingStrategy matingStrategy;
     private final MutationStrategy mutationStrategy;
 
-    GenerateOffspringTask(Individual[] currentPopulation, Individual[] nextPopulation, double[] cdf, int from, int to,
+    GenerateOffspringTask(Individual[] currentPopulation, Individual[] nextPopulation, double[] cdf,
+        int from, int to,
         RandomGenerator rnd, MatingStrategy matingStrategy, MutationStrategy mutationStrategy) {
       this.currentPopulation = currentPopulation;
       this.nextPopulation = nextPopulation;
@@ -183,7 +192,9 @@ public final class Solver {
 
         switch (mutationStrategy) {
           case RANDOM -> mutate(offspring, rnd);
-          case SIMULATED_ANNEALING -> offspring = simulatedAnnealing(offspring, simulatedAnnealingIterations, initialTemperature, rnd);
+          case SIMULATED_ANNEALING ->
+              offspring = simulatedAnnealing(offspring, simulatedAnnealingIterations,
+                  initialTemperature, rnd);
         }
 
         nextPopulation[i] = new Individual(offspring, costFunction.computeTotalCost(offspring));
@@ -200,7 +211,8 @@ public final class Solver {
       int extra = Math.min(rem, 1);
       futures[j] =
           CompletableFuture.runAsync(
-              new InitializePopulationTask(population, i, i + opsPerTask + extra, randoms[j]), pool);
+              new InitializePopulationTask(population, i, i + opsPerTask + extra, randoms[j]),
+              pool);
       i += extra;
       rem -= extra;
     }
@@ -214,7 +226,8 @@ public final class Solver {
       Arrays.fill(row, -1);
     }
 
-    record LessonPair(int group, int teacher) {}
+    record LessonPair(int group, int teacher) {
+    }
 
     var lessons = new HashMap<LessonPair, Integer>();
     for (var lesson : instance.lessons()) {
@@ -257,12 +270,13 @@ public final class Solver {
 
         int intersections = 0;
         for (int period = 0; period < instance.periodCount(); period++) {
-          if (isGroupAvailable[lesson.group][period] && isTeacherAvailable[lesson.teacher][period]) {
+          if (isGroupAvailable[lesson.group][period]
+              && isTeacherAvailable[lesson.teacher][period]) {
             intersections++;
           }
         }
 
-        double u  = 1.0 * unscheduledCount[lesson.group][lesson.teacher] / (intersections + 1);
+        double u = 1.0 * unscheduledCount[lesson.group][lesson.teacher] / (intersections + 1);
         urgency[lesson.group][lesson.teacher] = u;
         minUrgency = Math.min(minUrgency, u);
         maxUrgency = Math.max(maxUrgency, u);
@@ -280,7 +294,8 @@ public final class Solver {
 
       var freePeriods = new ArrayList<Integer>();
       for (int period = 0; period < instance.periodCount(); period++) {
-        if (isGroupAvailable[chosenLesson.group][period] && isTeacherAvailable[chosenLesson.teacher][period]) {
+        if (isGroupAvailable[chosenLesson.group][period]
+            && isTeacherAvailable[chosenLesson.teacher][period]) {
           freePeriods.add(period);
         }
       }
@@ -308,11 +323,13 @@ public final class Solver {
   }
 
   private Individual[] generateNextPopulation(
-      Individual[] currentPopulation, double[] cdf, MatingStrategy matingStrategy, MutationStrategy mutationStrategy,
+      Individual[] currentPopulation, double[] cdf, MatingStrategy matingStrategy,
+      MutationStrategy mutationStrategy,
       Executor pool) {
     // Pick the elite
     var elite = Stream.of(currentPopulation)
-        .sorted(Comparator.comparing(Individual::cost, Comparator.comparingInt(cost -> cost.total(weights))))
+        .sorted(Comparator.comparing(Individual::cost,
+            Comparator.comparingInt(cost -> cost.total(weights))))
         .limit(elitism)
         .toArray(Individual[]::new);
 
@@ -331,7 +348,8 @@ public final class Solver {
       futures[j] =
           CompletableFuture.runAsync(
               new GenerateOffspringTask(
-                  currentPopulation, nextPopulation, cdf, i, i + opsPerTask + extra, randoms[j], matingStrategy, mutationStrategy), pool);
+                  currentPopulation, nextPopulation, cdf, i, i + opsPerTask + extra, randoms[j],
+                  matingStrategy, mutationStrategy), pool);
       i += extra;
       rem -= extra;
     }
@@ -356,11 +374,12 @@ public final class Solver {
   Individual[] run() {
     var pool =
         new ThreadPoolExecutor(
-            parallelism, parallelism, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(parallelism), runnable -> {
+            parallelism, parallelism, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(parallelism),
+            runnable -> {
               var t = new Thread(runnable);
               t.setDaemon(true);
               return t;
-        });
+            });
 
     var population = new Individual[populationSize];
 
@@ -388,7 +407,8 @@ public final class Solver {
       }
 
       var matingStrategy = i % 2 == 0 ? MatingStrategy.ROULETTE_WHEEL : MatingStrategy.RANDOM;
-      var mutationStrategy = rootRnd.nextDouble() < 0.1 ? MutationStrategy.SIMULATED_ANNEALING : MutationStrategy.RANDOM;
+      var mutationStrategy = rootRnd.nextDouble() < 0.1 ? MutationStrategy.SIMULATED_ANNEALING
+          : MutationStrategy.RANDOM;
       population = generateNextPopulation(
           population,
           cdf,
@@ -425,7 +445,8 @@ public final class Solver {
     return selected;
   }
 
-  private int[][] simulatedAnnealing(int[][] table, int iterations, double initialTemperature, RandomGenerator rnd) {
+  private int[][] simulatedAnnealing(int[][] table, int iterations, double initialTemperature,
+      RandomGenerator rnd) {
     var mutatedTable = new int[instance.periodCount()][instance.groupCount()];
     for (int period = 0; period < instance.periodCount(); period++) {
       System.arraycopy(table[period], 0, mutatedTable[period], 0, instance.groupCount());
@@ -449,17 +470,18 @@ public final class Solver {
       if (delta >= 0
           && (delta == 0 || !(rnd.nextDouble() < p))
           && (delta != 0 || !(rnd.nextDouble() < 0.5))) {
-            // Reverse the mutation
-          int temp2 = mutatedTable[toPeriod][group];
-          mutatedTable[toPeriod][group] = mutatedTable[fromPeriod][group];
-          mutatedTable[fromPeriod][group] = temp2;
-        }
+        // Reverse the mutation
+        int temp2 = mutatedTable[toPeriod][group];
+        mutatedTable[toPeriod][group] = mutatedTable[fromPeriod][group];
+        mutatedTable[fromPeriod][group] = temp2;
+      }
     }
     return mutatedTable;
   }
 
   public static void main(String[] args) {
-    var weights = new Weights(new HardWeights(200.0, 200.0, 200.0, 200.0, 200.0), new SoftWeights(2.0, 4.0));
+    var weights = new Weights(new HardWeights(200.0, 200.0, 200.0, 200.0, 200.0),
+        new SoftWeights(2.0, 4.0));
     var ga =
         new Solver(
             Samples.readInstance("NE-CESVP-2011-M-D.xml"),
@@ -477,7 +499,8 @@ public final class Solver {
             60.0);
 
     var result = ga.run();
-    var best = Stream.of(result).min(Comparator.comparing(Individual::cost, Comparator.comparingInt(cost -> cost.total(weights)))).orElseThrow();
+    var best = Stream.of(result).min(Comparator.comparing(Individual::cost,
+        Comparator.comparingInt(cost -> cost.total(weights)))).orElseThrow();
     System.out.println("Best cost: " + best.cost());
 
     ga.printTable(best.table());
