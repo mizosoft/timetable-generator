@@ -116,9 +116,9 @@ empty timetable is created. As long as there are lessons to schedule, the algori
 * Select a random lesson from the restricted list and allocate it to a random period available to both the class and the teacher,
   or only available to the class if there's no former period (possibly introducing a teacher clash).
 
-## Some Results
+## Running
 
-Run `Solver.main`. The printed solution presents each day's timetable, where rows represent the class
+You run from `Solver.main`. The printed solution presents each day's timetable, where rows represent the class
 index and columns represents the day's timeslots. Each cell holds the teacher assigned to the cell's class at
 its timeslot.
 
