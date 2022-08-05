@@ -8,15 +8,15 @@ greedily randomized construction of the initial population.
 
 The school timetabling problem involves allocating resources (e.g. teachers, classes, rooms) to timeslots,
 such that each resource has at most one allocation per timeslot.
-This is an NP-complete problem [1], meaning there exists no efficient algorithm for finding an optimal solution for the problem. 
+This is an NP-complete problem [1], meaning there exists no known efficient algorithm for finding an optimal solution. 
 
-This project tackles the Class-Teacher variant of this problem. It is assumed that class & teacher
+This project tackles the Class-Teacher variant of the timetabling problem. It is assumed that class & teacher
 associations are known beforehand (i.e. it is known which classes ought to take what lessons with which teachers). This 
 is typical of most schools in some regions. Additionally, each class is expected to have an allotted room for each lesson,
 which is not an unusual expectation. Thus, room allocations aren't taken into account.
 
-A solution of the timetabling problem should satisfy two types of constrains: hard & soft constrains. A solution
-is only considered feasible if it satisfies 100% of the hard constraints, while soft constraints give a measure
+A solution of the timetabling problem should satisfy two types of constrains: ***hard*** & ***soft***. A solution
+is considered feasible only if it satisfies 100% of hard constraints, while soft constraints give a measure
 of quality to the solution and aren't expected to be completely satisfied. 
 
 The following constraints are used:
@@ -58,7 +58,7 @@ crossover in mind. Two representation were tested:
 
 ### Mating
 
-The first representation resulted in lower quality results. This is mainly because it makes mating tricky. In order
+The first representation resulted in lower quality solutions. This is mainly because it makes mating tricky. In order
 to mate two solutions, each list is merged with another across a crossover site. This results in lessons
 being lost and/or repeated in the resulted offspring, requiring a label replacement algorithm to randomly
 replace or remove lost or repeated lessons respectively [2]. 
@@ -68,7 +68,7 @@ each column from either of its parents. Since each column represents a class's s
 each schedule contains the same lessons but differs only in assigned periods.
 
 In addition to random selection of either parent's class schedule to generate an offspring, [roulette wheel selection](https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
-is used to give the fittest parents higher probability of getting their class schedules selected.
+is used to provide the fittest parents higher probability of getting their class schedules selected.
 These two schemes are applied in turn each iteration. This allows some diversity in the population, while ensuring offsprings inherit
 more genes from the fittest solutions.
 
@@ -77,23 +77,23 @@ more genes from the fittest solutions.
 [Roulette wheel selection](https://en.wikipedia.org/wiki/Fitness_proportionate_selection) is used to
 select parents during mating. This allows the fittest solutions to have more probability of being
 selected, but doesn't completely eliminate less fit solutions from being selected. This is good as less
-fit solutions might still contain good isolated properties.
+fit solutions might nevertheless contain good isolated properties.
 
-Instead of generating a mating pool using roulette wheel and selecting random solutions from the pool 
-when mating, roulette wheel selection was performed on the whole population whenever a parent is need.
-This gave better results than the former approach as it gives less fit solutions better chance to get selected.
+Instead of generating a mating pool using roulette wheel and selecting parents randomly from the pool 
+when mating, roulette wheel selection is performed on the whole population whenever a parent is needed.
+This gives better results than the former approach as it gives less fit solutions better chance to get selected.
 
 ### Mutation
 
 In each iteration of the algorithm, a mutation strategy of two is chosen randomly. The first scheme
-chooses a class randomly and swaps the teachers at two randomly selected timeslots. The mutation is performed based on some probability that's increased each iteration
+chooses a class randomly and swaps the teachers at two randomly selected timeslots. The mutation is performed based on some probability (the mutation probability) that's increased each iteration
 (ensuring more mutations happened at a minima). The second mutation strategy is based on Simulated Annealing.
 
 ## Simulated Annealing
 
 Simulated Annealing is another computational inspiration from a natural process. It draws from the concept
 of annealing in metallurgy, where materials are controllably cooled from high temperatures, seeking better
-quality (less hardness and more workability in case of metals). 
+quality (e.g. less hardness and more workability in case of metals). 
 
 At each iteration of Simulated Annealing, a random mutation is performed on the timetable (analogous to random
 atom displacements in highly heated materials). If the mutation results in a lower cost, the mutation is accepted.
@@ -107,20 +107,20 @@ empty timetable is created. As long as there are lessons to schedule, the algori
 
 * Create a candidate list containing all the lessons whose required number of weekly occurrence
   is not yet exhausted.
-* Calculate an urgency degree to each lesson that equals `unscheduled[lesson.class][lesson.teacher] / (intersections + 1)`. Where
-  `unscheduled[lesson.class][lesson.teacher]` is the number of weekly occurrences not yet satisfied for the lesson, 
+* Calculate an urgency degree to each lesson that equals `unscheduled[lesson] / (intersections + 1)`. Where
+  `unscheduled[lesson]` is the number of weekly occurrences not yet scheduled for the lesson, 
   and `intersections` is the number of yet unscheduled periods available to both `lesson.class` and `lesson.teacher`.
 * Calculate min & max of the urgency degrees.
-* Create a restricted candidate list from the initial list by only choosing lessons that have `urgency[lesson.class][lesson.teacher] >= maxUrgency - alpha * (maxUrgency - minUrgency)`. `alpha`
+* Create a restricted candidate list from the initial list by only choosing lessons that have `urgency[lesson] >= maxUrgency - alpha * (maxUrgency - minUrgency)`. `alpha`
   controls the degree of randomness to greediness the algorithm uses (`0` gives no randomness, `1` gives no greediness).
 * Select a random lesson from the restricted list and allocate it to a random period available to both the class and the teacher,
-  or only available to the class if there's no former period (possibly introducing a teacher clash).
+  or only available to the class if there's no commonly available period (possibly introducing a teacher clash).
 
 ## Running
 
 You run from `Solver.main`. The printed solution presents each day's timetable, where rows represent the class
 index and columns represents the day's timeslots. Each cell holds the teacher assigned to the cell's class at
-its timeslot.
+its timeslot. An example of a day's timetable:
 
 ```
 Day: 0
